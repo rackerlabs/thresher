@@ -40,7 +40,6 @@ from glob import iglob
 from os import path
 from platform import uname
 from logging.handlers import SysLogHandler
-from distutils.version import LooseVersion
 
 try:
     import configparser
@@ -297,15 +296,7 @@ def kthreshing(purge=None, headers=None, keep=1):
             "autoremoval".format(len(kernel_versions))
         )
         logger.info("Pre-sorting: {0}".format(kernel_versions))
-        try:
-            # Sadly this is broken in python3, https://bugs.python.org/issue14894
-            sorted_kernel_list = sorted(kernel_versions, key=LooseVersion)
-        except TypeError:
-            # Using apt_pkg.version_compare
-            # https://github.com/rackerlabs/kthresher/pull/61
-            sorted_kernel_list = sorted(
-                kernel_versions, key=cmp_to_key(apt.apt_pkg.version_compare)
-            )
+        sorted_kernel_list = sorted(kernel_versions, key=cmp_to_key(apt.apt_pkg.version_compare))
 
         logger.info("Post-sorting: {0}".format(sorted_kernel_list))
         if keep >= len(kernel_versions):
